@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +36,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteByOrderId(Integer orderId) {
         repository.deleteById(orderId);
+    }
+
+    @Override
+    public Optional<OrderEntity> searchByOrderId(Integer orderId) {
+        return repository.findById(orderId);
     }
 }
