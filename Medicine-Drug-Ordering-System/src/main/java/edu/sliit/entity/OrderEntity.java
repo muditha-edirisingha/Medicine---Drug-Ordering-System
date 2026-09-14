@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import jakarta.persistence.Column;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +21,7 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderId;
-    private LocalDateTime orderdate;
+    private LocalDateTime orderDate;
     private String  orderStatus;
 
     private Double totalAmount;
