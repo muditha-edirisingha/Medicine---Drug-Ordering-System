@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class Order {
     private Integer orderId;
-    private LocalDateTime orderdate;
+    private LocalDateTime orderDate;
     private String  orderStatus;
 
     private Double totalAmount;
