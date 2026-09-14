@@ -1,24 +1,29 @@
 package edu.sliit.Controller;
 
+
 import edu.sliit.dto.Order;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import edu.sliit.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @CrossOrigin
+@RequiredArgsConstructor
 public class OrderController {
-    @GetMapping
-    public Order getOrder(){
-        return new Order(
-            001,
-                LocalDateTime.parse("2007-12-03T10:15:30"),
-                "accepted",
-                150.0,
-                "Ellakkala"
 
+    final OrderService service ;
 
-        );
+    @GetMapping("/get-all-order")
+    public List<Order> getOrder(){
+        return service.getOrder();
+    }
+
+    @PostMapping("/add-order")
+    public  void addOrder(@RequestBody Order order){
+        service.addOrder(order);
+
     }
 }
