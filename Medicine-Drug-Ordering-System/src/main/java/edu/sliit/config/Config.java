@@ -2,12 +2,7 @@ package edu.sliit.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-
-
-
-public class Config {
-
+import org.modelmapper.ModelMapper;
 
 @Configuration
 public class Config {
