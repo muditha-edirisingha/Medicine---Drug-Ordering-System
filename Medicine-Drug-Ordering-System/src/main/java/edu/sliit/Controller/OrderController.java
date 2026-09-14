@@ -26,4 +26,9 @@ public class OrderController {
         service.addOrder(order);
 
     }
+
+    @DeleteMapping("/delete-by-id/{orderId}")
+    public void deleteById(@PathVariable Integer orderId){
+        service.deleteByOrderId(orderId);
+    }
 }
