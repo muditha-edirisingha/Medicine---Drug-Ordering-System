@@ -1,0 +1,53 @@
+package edu.sliit.serviceImpl;
+
+import edu.sliit.dto.Order;
+import edu.sliit.entity.OrderEntity;
+import edu.sliit.repository.OrderItemRepository;
+import edu.sliit.repository.OrderRepository;
+import edu.sliit.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+    
+    final OrderRepository repository;
+    final OrderItemRepository orderItemRepository;
+    final ModelMapper mapper;
+
+    @Override
+    public List<Order> getOrder() {
+        List<Order> orders = new ArrayList<>();
+        repository.findAll().forEach(order->{
+            orders.add(mapper.map(order, Order.class));
+        });
+        return orders;
+    }
+
+    @Override
+    public void addOrder(Order order) {
+
+        repository.save(mapper.map(order, OrderEntity.class));
+    }
+
+    @Override
+    @Transactional
+    public void deleteByOrderId(Integer orderId) {
+
+        orderItemRepository.deleteByOrder_OrderId(orderId);
+
+        repository.deleteById(orderId);
+    }
+
+    @Override
+    public Optional<OrderEntity> searchByOrderId(Integer orderId) {
+        return repository.findById(orderId);
+    }
+}
