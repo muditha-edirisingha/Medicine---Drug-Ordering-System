@@ -8,9 +8,11 @@ import java.util.Optional;
 
 public interface OrderService {
     List<Order> getOrder();
+
     void addOrder(Order order);
 
     void deleteByOrderId(Integer orderId);
 
     Optional<OrderEntity> searchByOrderId(Integer orderId);
+
 }
