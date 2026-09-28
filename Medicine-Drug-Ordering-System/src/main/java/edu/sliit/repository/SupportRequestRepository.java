@@ -6,7 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SupportRequestRepository extends JpaRepository<SupportRequestEntity, Integer> {
-    List<SupportRequestEntity> findByCustomerId(Integer customerId);
+    List<SupportRequestEntity> findByCustomer_CustomerId(Integer customerId);
+
+    List<SupportRequestEntity> findBySupportOfficer_SupportOfficerId(
+            Integer supportOfficerId);
 
     List<SupportRequestEntity> findByStatusIgnoreCase(String status);
 }

@@ -11,22 +11,19 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "branches")
-public class BranchEntity {
+@Table(name = "pharmacists")
+public class PharmacistEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer branchId;
+    private Integer pharmacistId;
 
-    private String branchName;
-    private String phoneNo;
+    private String firstName;
+    private String lastName;
     private String email;
-    private String openingTime;
-    private String closingTime;
+    private String phoneNo;
+    private String licenseNo;
+    private String username;
+    private String password;
     private String status;
-    private String address;
-
-    @ManyToOne
-    @JoinColumn(name = "manager_id")
-    private PharmacyManagerEntity manager;
 }

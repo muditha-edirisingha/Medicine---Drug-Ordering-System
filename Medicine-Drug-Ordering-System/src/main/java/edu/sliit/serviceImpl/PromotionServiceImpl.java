@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import edu.sliit.entity.MarketingOfficerEntity;
+import edu.sliit.repository.MarketingOfficerRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +21,27 @@ public class PromotionServiceImpl implements PromotionService {
 
     final PromotionRepository repository;
     final CouponRepository couponRepository;
+    final MarketingOfficerRepository marketingOfficerRepository;
     final ModelMapper mapper;
+
     @Override
     public List<Promotion> getPromotions() {
+
         List<Promotion> promotions = new ArrayList<>();
 
-        repository.findAll().forEach(promotion -> {
+        repository.findAll().forEach(promotionEntity -> {
 
-            promotions.add(
-                    mapper.map(promotion, Promotion.class)
-            );
+            Promotion promotion =
+                    mapper.map(promotionEntity, Promotion.class);
 
+            if (promotionEntity.getMarketingOfficer() != null) {
+                promotion.setMarketingOfficerId(
+                        promotionEntity.getMarketingOfficer()
+                                .getMarketingOfficerId()
+                );
+            }
+
+            promotions.add(promotion);
         });
 
         return promotions;
@@ -37,20 +49,30 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public void addPromotion(Promotion promotion) {
+
         if (promotion.getStatus() == null) {
             promotion.setStatus("ACTIVE");
         }
 
-        repository.save(
-                mapper.map(
-                        promotion,
-                        PromotionEntity.class
-                )
-        );
+        PromotionEntity entity =
+                mapper.map(promotion, PromotionEntity.class);
+
+        MarketingOfficerEntity marketingOfficer =
+                marketingOfficerRepository
+                        .findById(promotion.getMarketingOfficerId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Marketing Officer not found"
+                                ));
+
+        entity.setMarketingOfficer(marketingOfficer);
+
+        repository.save(entity);
     }
 
     @Override
     public Promotion searchByPromotionId(Integer promotionId) {
+
         PromotionEntity entity =
                 repository.findById(promotionId)
                         .orElseThrow(() ->
@@ -58,24 +80,43 @@ public class PromotionServiceImpl implements PromotionService {
                                         "Promotion not found"
                                 ));
 
-        return mapper.map(entity, Promotion.class);
+        Promotion promotion =
+                mapper.map(entity, Promotion.class);
+
+        if (entity.getMarketingOfficer() != null) {
+            promotion.setMarketingOfficerId(
+                    entity.getMarketingOfficer()
+                            .getMarketingOfficerId()
+            );
+        }
+
+        return promotion;
     }
 
     @Override
-    public List<Promotion> searchByPromotionName(String promotionName) {
+    public List<Promotion> searchByPromotionName(
+            String promotionName) {
+
         List<Promotion> promotions = new ArrayList<>();
 
         repository.findByPromotionNameContainingIgnoreCase(
                 promotionName
-        ).forEach(promotion -> {
+        ).forEach(promotionEntity -> {
 
-            promotions.add(
+            Promotion promotion =
                     mapper.map(
-                            promotion,
+                            promotionEntity,
                             Promotion.class
-                    )
-            );
+                    );
 
+            if (promotionEntity.getMarketingOfficer() != null) {
+                promotion.setMarketingOfficerId(
+                        promotionEntity.getMarketingOfficer()
+                                .getMarketingOfficerId()
+                );
+            }
+
+            promotions.add(promotion);
         });
 
         return promotions;
@@ -83,18 +124,26 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public List<Promotion> searchByStatus(String status) {
+
         List<Promotion> promotions = new ArrayList<>();
 
         repository.findByStatusIgnoreCase(status)
-                .forEach(promotion -> {
+                .forEach(promotionEntity -> {
 
-                    promotions.add(
+                    Promotion promotion =
                             mapper.map(
-                                    promotion,
+                                    promotionEntity,
                                     Promotion.class
-                            )
-                    );
+                            );
 
+                    if (promotionEntity.getMarketingOfficer() != null) {
+                        promotion.setMarketingOfficerId(
+                                promotionEntity.getMarketingOfficer()
+                                        .getMarketingOfficerId()
+                        );
+                    }
+
+                    promotions.add(promotion);
                 });
 
         return promotions;
@@ -102,6 +151,7 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public void updatePromotion(Promotion promotion) {
+
         if (!repository.existsById(
                 promotion.getPromotionId())) {
 
@@ -110,12 +160,23 @@ public class PromotionServiceImpl implements PromotionService {
             );
         }
 
-        repository.save(
+        PromotionEntity entity =
                 mapper.map(
                         promotion,
                         PromotionEntity.class
-                )
-        );
+                );
+
+        MarketingOfficerEntity marketingOfficer =
+                marketingOfficerRepository
+                        .findById(promotion.getMarketingOfficerId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Marketing Officer not found"
+                                ));
+
+        entity.setMarketingOfficer(marketingOfficer);
+
+        repository.save(entity);
     }
 
     @Override

@@ -9,15 +9,15 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Branch {
+public class PharmacyManager {
 
-    private Integer branchId;
     private Integer managerId;
-    private String branchName;
-    private String phoneNo;
+
+    private String firstName;
+    private String lastName;
     private String email;
-    private String openingTime;
-    private String closingTime;
+    private String phoneNo;
+    private String username;
+    private String password;
     private String status;
-    private String address;
 }

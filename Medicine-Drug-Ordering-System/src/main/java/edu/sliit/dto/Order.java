@@ -13,13 +13,9 @@ import java.time.LocalDateTime;
 @ToString
 public class Order {
     private Integer orderId;
-
+    private Integer customerId;
     private LocalDateTime orderDate;
-
-    private LocalDateTime orderdate;
-
     private String  orderStatus;
-
     private Double totalAmount;
     private String deliveryAddress;
 }

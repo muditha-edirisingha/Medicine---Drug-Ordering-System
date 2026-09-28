@@ -1,12 +1,16 @@
 package edu.sliit.serviceImpl;
 
 import edu.sliit.dto.Prescription;
+import edu.sliit.entity.CustomerEntity;
 import edu.sliit.entity.PrescriptionEntity;
+import edu.sliit.repository.CustomerRepository;
 import edu.sliit.repository.PrescriptionRepository;
 import edu.sliit.service.PrescriptionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import edu.sliit.entity.PharmacistEntity;
+import edu.sliit.repository.PharmacistRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,17 +21,32 @@ import java.util.List;
 public class PrescriptionServiceImpl implements PrescriptionService{
     final PrescriptionRepository repository;
     final ModelMapper mapper;
+    final PharmacistRepository pharmacistRepository;
+    final CustomerRepository customerRepository;
 
     @Override
     public List<Prescription> getPrescriptions() {
+
         List<Prescription> prescriptions = new ArrayList<>();
 
-        repository.findAll().forEach(prescription -> {
+        repository.findAll().forEach(prescriptionEntity -> {
 
-            prescriptions.add(
-                    mapper.map(prescription, Prescription.class)
-            );
+            Prescription prescription =
+                    mapper.map(prescriptionEntity, Prescription.class);
 
+            if (prescriptionEntity.getCustomer() != null) {
+                prescription.setCustomerId(
+                        prescriptionEntity.getCustomer().getCustomerId()
+                );
+            }
+
+            if (prescriptionEntity.getPharmacist() != null) {
+                prescription.setPharmacistId(
+                        prescriptionEntity.getPharmacist().getPharmacistId()
+                );
+            }
+
+            prescriptions.add(prescription);
         });
 
         return prescriptions;
@@ -35,6 +54,7 @@ public class PrescriptionServiceImpl implements PrescriptionService{
 
     @Override
     public void addPrescription(Prescription prescription) {
+
         if (prescription.getUploadDate() == null) {
             prescription.setUploadDate(LocalDateTime.now());
         }
@@ -43,9 +63,23 @@ public class PrescriptionServiceImpl implements PrescriptionService{
             prescription.setStatus("PENDING");
         }
 
-        repository.save(
-                mapper.map(prescription, PrescriptionEntity.class)
-        );
+        PrescriptionEntity entity =
+                mapper.map(prescription, PrescriptionEntity.class);
+
+        CustomerEntity customer = customerRepository
+                .findById(prescription.getCustomerId())
+                .orElseThrow(() ->
+                        new RuntimeException("Customer not found"));
+
+        PharmacistEntity pharmacist = pharmacistRepository
+                .findById(prescription.getPharmacistId())
+                .orElseThrow(() ->
+                        new RuntimeException("Pharmacist not found"));
+
+        entity.setCustomer(customer);
+        entity.setPharmacist(pharmacist);
+
+        repository.save(entity);
     }
 
     @Override
@@ -62,7 +96,7 @@ public class PrescriptionServiceImpl implements PrescriptionService{
     public List<Prescription> searchByCustomerId(Integer customerId) {
         List<Prescription> prescriptions = new ArrayList<>();
 
-        repository.findByCustomerId(customerId)
+        repository.findByCustomer_CustomerId(customerId)
                 .forEach(prescription -> {
 
                     prescriptions.add(
