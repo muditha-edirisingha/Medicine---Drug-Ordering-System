@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/customer-support-officer")
 @RequiredArgsConstructor
+
 public class CustomerSupportOfficerController {
 
     final CustomerSupportOfficerService service;

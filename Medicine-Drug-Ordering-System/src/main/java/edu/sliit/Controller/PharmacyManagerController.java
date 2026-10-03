@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/pharmacy-manager")
 @RequiredArgsConstructor
+
 public class PharmacyManagerController {
 
     final PharmacyManagerService service;
