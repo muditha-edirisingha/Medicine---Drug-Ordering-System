@@ -71,13 +71,17 @@ public class PrescriptionServiceImpl implements PrescriptionService{
                 .orElseThrow(() ->
                         new RuntimeException("Customer not found"));
 
-        PharmacistEntity pharmacist = pharmacistRepository
-                .findById(prescription.getPharmacistId())
-                .orElseThrow(() ->
-                        new RuntimeException("Pharmacist not found"));
-
         entity.setCustomer(customer);
-        entity.setPharmacist(pharmacist);
+
+        // Pharmacist is optional when customer uploads prescription
+        if (prescription.getPharmacistId() != null) {
+            PharmacistEntity pharmacist = pharmacistRepository
+                    .findById(prescription.getPharmacistId())
+                    .orElseThrow(() ->
+                            new RuntimeException("Pharmacist not found"));
+
+            entity.setPharmacist(pharmacist);
+        }
 
         repository.save(entity);
     }
@@ -126,20 +130,39 @@ public class PrescriptionServiceImpl implements PrescriptionService{
 
     @Override
     public void updatePrescription(Prescription prescription) {
-        if (!repository.existsById(prescription.getPrescriptionId())) {
-            throw new RuntimeException("Prescription not found");
-        }
 
-        if (prescription.getStatus() != null &&
-                (prescription.getStatus().equalsIgnoreCase("APPROVED") ||
-                        prescription.getStatus().equalsIgnoreCase("REJECTED"))) {
-
-            prescription.setReviewedDate(LocalDateTime.now());
-        }
-
-        repository.save(
-                mapper.map(prescription, PrescriptionEntity.class)
+        PrescriptionEntity entity = repository.findById(
+                prescription.getPrescriptionId()
+        ).orElseThrow(() ->
+                new RuntimeException("Prescription not found")
         );
+
+        // Update pharmacist only when pharmacistId is provided
+        if (prescription.getPharmacistId() != null) {
+
+            PharmacistEntity pharmacist = pharmacistRepository
+                    .findById(prescription.getPharmacistId())
+                    .orElseThrow(() ->
+                            new RuntimeException("Pharmacist not found"));
+
+            entity.setPharmacist(pharmacist);
+        }
+
+        if (prescription.getStatus() != null) {
+            entity.setStatus(prescription.getStatus());
+
+            if (prescription.getStatus().equalsIgnoreCase("APPROVED") ||
+                    prescription.getStatus().equalsIgnoreCase("REJECTED")) {
+
+                entity.setReviewedDate(LocalDateTime.now());
+            }
+        }
+
+        if (prescription.getRejectionReason() != null) {
+            entity.setRejectionReason(prescription.getRejectionReason());
+        }
+
+        repository.save(entity);
     }
 
     @Override

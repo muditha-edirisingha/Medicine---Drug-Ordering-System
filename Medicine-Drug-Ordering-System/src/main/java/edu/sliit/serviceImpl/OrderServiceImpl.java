@@ -76,4 +76,27 @@ public class OrderServiceImpl implements OrderService {
     public Optional<OrderEntity> searchByOrderId(Integer orderId) {
         return repository.findById(orderId);
     }
+
+    @Override
+    public List<Order> searchByCustomerId(Integer customerId) {
+
+        List<Order> orders = new ArrayList<>();
+
+        repository.findByCustomer_CustomerId(customerId)
+                .forEach(orderEntity -> {
+
+                    Order order =
+                            mapper.map(orderEntity, Order.class);
+
+                    if (orderEntity.getCustomer() != null) {
+                        order.setCustomerId(
+                                orderEntity.getCustomer().getCustomerId()
+                        );
+                    }
+
+                    orders.add(order);
+                });
+
+        return orders;
+    }
 }

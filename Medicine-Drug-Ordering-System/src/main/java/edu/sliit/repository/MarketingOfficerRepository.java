@@ -2,7 +2,7 @@ package edu.sliit.repository;
 
 import edu.sliit.entity.MarketingOfficerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.Optional;
 import java.util.List;
 
 public interface MarketingOfficerRepository
@@ -16,4 +16,6 @@ public interface MarketingOfficerRepository
 
     List<MarketingOfficerEntity>
     findByStatusIgnoreCase(String status);
+
+    Optional<MarketingOfficerEntity> findByUsername(String username);
 }

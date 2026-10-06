@@ -49,4 +49,11 @@ public class OrderController {
         service.addOrder(order);
 
     }
+
+    @GetMapping("/search-by-customer-id/{customerId}")
+    public List<Order> searchByCustomerId(
+            @PathVariable Integer customerId) {
+
+        return service.searchByCustomerId(customerId);
+    }
 }

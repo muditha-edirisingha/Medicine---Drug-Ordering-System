@@ -2,7 +2,7 @@ package edu.sliit.repository;
 
 import edu.sliit.entity.PharmacistEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.Optional;
 import java.util.List;
 
 public interface PharmacistRepository
@@ -13,4 +13,6 @@ public interface PharmacistRepository
     List<PharmacistEntity> findByEmailContainingIgnoreCase(String email);
 
     List<PharmacistEntity> findByStatusIgnoreCase(String status);
+    Optional<PharmacistEntity> findByUsername(String username);
+
 }

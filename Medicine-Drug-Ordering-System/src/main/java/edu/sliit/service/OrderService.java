@@ -15,4 +15,6 @@ public interface OrderService {
 
     Optional<OrderEntity> searchByOrderId(Integer orderId);
 
+    List<Order> searchByCustomerId(Integer customerId);
+
 }

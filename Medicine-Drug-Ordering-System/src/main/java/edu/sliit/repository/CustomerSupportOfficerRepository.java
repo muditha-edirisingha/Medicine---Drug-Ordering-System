@@ -2,7 +2,7 @@ package edu.sliit.repository;
 
 import edu.sliit.entity.CustomerSupportOfficerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.Optional;
 import java.util.List;
 
 public interface CustomerSupportOfficerRepository
@@ -16,4 +16,6 @@ public interface CustomerSupportOfficerRepository
 
     List<CustomerSupportOfficerEntity>
     findByStatusIgnoreCase(String status);
+
+    Optional<CustomerSupportOfficerEntity> findByUsername(String username);
 }

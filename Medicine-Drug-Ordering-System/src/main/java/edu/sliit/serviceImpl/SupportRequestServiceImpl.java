@@ -61,9 +61,7 @@ public class SupportRequestServiceImpl implements SupportRequestService {
     public void addSupportRequest(SupportRequest supportRequest) {
 
         if (supportRequest.getRequestDate() == null) {
-            supportRequest.setRequestDate(
-                    LocalDateTime.now()
-            );
+            supportRequest.setRequestDate(LocalDateTime.now());
         }
 
         if (supportRequest.getStatus() == null) {
@@ -80,6 +78,7 @@ public class SupportRequestServiceImpl implements SupportRequestService {
                         SupportRequestEntity.class
                 );
 
+        // Customer is required
         CustomerEntity customer =
                 customerRepository.findById(
                         supportRequest.getCustomerId()
@@ -89,17 +88,22 @@ public class SupportRequestServiceImpl implements SupportRequestService {
                         )
                 );
 
-        CustomerSupportOfficerEntity supportOfficer =
-                customerSupportOfficerRepository.findById(
-                        supportRequest.getSupportOfficerId()
-                ).orElseThrow(() ->
-                        new RuntimeException(
-                                "Customer support officer not found"
-                        )
-                );
-
         entity.setCustomer(customer);
-        entity.setSupportOfficer(supportOfficer);
+
+        // Support officer is optional when customer creates request
+        if (supportRequest.getSupportOfficerId() != null) {
+
+            CustomerSupportOfficerEntity supportOfficer =
+                    customerSupportOfficerRepository.findById(
+                            supportRequest.getSupportOfficerId()
+                    ).orElseThrow(() ->
+                            new RuntimeException(
+                                    "Customer support officer not found"
+                            )
+                    );
+
+            entity.setSupportOfficer(supportOfficer);
+        }
 
         repository.save(entity);
     }
