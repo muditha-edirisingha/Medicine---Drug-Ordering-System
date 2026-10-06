@@ -43,11 +43,10 @@ public class OrderController {
         service.deleteByOrderId(orderId);
     }
 
-    @PutMapping("update")
+    @PutMapping("/update")
     @ResponseStatus(HttpStatus.OK)
-    public  void updateOrder(@RequestBody Order order){
-        service.addOrder(order);
-
+    public void updateOrder(@RequestBody Order order) {
+        service.updateOrder(order);
     }
 
     @GetMapping("/search-by-customer-id/{customerId}")

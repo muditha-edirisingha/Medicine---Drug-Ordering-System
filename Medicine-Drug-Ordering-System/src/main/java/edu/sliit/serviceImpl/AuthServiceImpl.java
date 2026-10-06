@@ -2,11 +2,7 @@ package edu.sliit.serviceImpl;
 
 import edu.sliit.dto.LoginRequest;
 import edu.sliit.dto.LoginResponse;
-import edu.sliit.entity.CustomerEntity;
-import edu.sliit.entity.CustomerSupportOfficerEntity;
-import edu.sliit.entity.MarketingOfficerEntity;
-import edu.sliit.entity.PharmacistEntity;
-import edu.sliit.entity.PharmacyManagerEntity;
+import edu.sliit.entity.*;
 import edu.sliit.repository.CustomerRepository;
 import edu.sliit.repository.CustomerSupportOfficerRepository;
 import edu.sliit.repository.MarketingOfficerRepository;
@@ -22,6 +18,8 @@ import edu.sliit.entity.PharmacistEntity;
 import edu.sliit.entity.PharmacyManagerEntity;
 import edu.sliit.entity.MarketingOfficerEntity;
 import edu.sliit.entity.CustomerSupportOfficerEntity;
+import edu.sliit.repository.OrderManagerRepository;
+import edu.sliit.repository.BranchManagerRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +30,8 @@ public class AuthServiceImpl implements AuthService {
     private final PharmacyManagerRepository pharmacyManagerRepository;
     private final MarketingOfficerRepository marketingOfficerRepository;
     private final CustomerSupportOfficerRepository customerSupportOfficerRepository;
+    private final OrderManagerRepository orderManagerRepository;
+    private final BranchManagerRepository branchManagerRepository;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -81,6 +81,38 @@ public class AuthServiceImpl implements AuthService {
                     entity.getManagerId(),
                     entity.getUsername(),
                     "PHARMACY_MANAGER"
+            );
+        }
+
+        // Order Manager
+        var orderManager = orderManagerRepository
+                .findByUsername(request.getUsername());
+
+        if (orderManager.isPresent()
+                && orderManager.get().getPassword().equals(request.getPassword())) {
+
+            OrderManagerEntity entity = orderManager.get();
+
+            return new LoginResponse(
+                    entity.getOrderManagerId(),
+                    entity.getUsername(),
+                    "ORDER_MANAGER"
+            );
+        }
+
+        // Branch Manager
+        var branchManager = branchManagerRepository
+                .findByUsername(request.getUsername());
+
+        if (branchManager.isPresent()
+                && branchManager.get().getPassword().equals(request.getPassword())) {
+
+            BranchManagerEntity entity = branchManager.get();
+
+            return new LoginResponse(
+                    entity.getBranchManagerId(),
+                    entity.getUsername(),
+                    "BRANCH_MANAGER"
             );
         }
 
@@ -149,7 +181,9 @@ public class AuthServiceImpl implements AuthService {
         if (pharmacistRepository.findByUsername(request.getUsername()).isPresent()
                 || pharmacyManagerRepository.findByUsername(request.getUsername()).isPresent()
                 || marketingOfficerRepository.findByUsername(request.getUsername()).isPresent()
-                || customerSupportOfficerRepository.findByUsername(request.getUsername()).isPresent()) {
+                || customerSupportOfficerRepository.findByUsername(request.getUsername()).isPresent()
+                || orderManagerRepository.findByUsername(request.getUsername()).isPresent()
+                || branchManagerRepository.findByUsername(request.getUsername()).isPresent()) {
 
             throw new RuntimeException("Username already exists");
         }
@@ -220,6 +254,37 @@ public class AuthServiceImpl implements AuthService {
                 supportOfficer.setStatus("ACTIVE");
 
                 customerSupportOfficerRepository.save(supportOfficer);
+                break;
+
+            case "ORDER_MANAGER":
+
+                OrderManagerEntity orderManager = new OrderManagerEntity();
+
+                orderManager.setFirstName(request.getFirstName());
+                orderManager.setLastName(request.getLastName());
+                orderManager.setEmail(request.getEmail());
+                orderManager.setPhoneNo(request.getPhoneNo());
+                orderManager.setUsername(request.getUsername());
+                orderManager.setPassword(request.getPassword());
+                orderManager.setStatus("ACTIVE");
+
+                orderManagerRepository.save(orderManager);
+                break;
+
+
+            case "BRANCH_MANAGER":
+
+                BranchManagerEntity branchManager = new BranchManagerEntity();
+
+                branchManager.setFirstName(request.getFirstName());
+                branchManager.setLastName(request.getLastName());
+                branchManager.setEmail(request.getEmail());
+                branchManager.setPhoneNo(request.getPhoneNo());
+                branchManager.setUsername(request.getUsername());
+                branchManager.setPassword(request.getPassword());
+                branchManager.setStatus("ACTIVE");
+
+                branchManagerRepository.save(branchManager);
                 break;
 
 

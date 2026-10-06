@@ -64,6 +64,42 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void updateOrder(Order order) {
+
+        OrderEntity entity = repository.findById(order.getOrderId())
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        if (order.getCustomerId() != null) {
+
+            CustomerEntity customer = customerRepository
+                    .findById(order.getCustomerId())
+                    .orElseThrow(() ->
+                            new RuntimeException("Customer not found"));
+
+            entity.setCustomer(customer);
+        }
+
+        if (order.getOrderDate() != null) {
+            entity.setOrderDate(order.getOrderDate());
+        }
+
+        if (order.getOrderStatus() != null) {
+            entity.setOrderStatus(order.getOrderStatus());
+        }
+
+        if (order.getTotalAmount() != null) {
+            entity.setTotalAmount(order.getTotalAmount());
+        }
+
+        if (order.getDeliveryAddress() != null) {
+            entity.setDeliveryAddress(order.getDeliveryAddress());
+        }
+
+        repository.save(entity);
+    }
+
+    @Override
     @Transactional
     public void deleteByOrderId(Integer orderId) {
 

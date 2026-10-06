@@ -2,13 +2,13 @@ package edu.sliit.serviceImpl;
 
 import edu.sliit.dto.Branch;
 import edu.sliit.entity.BranchEntity;
+import edu.sliit.entity.BranchManagerEntity;
+import edu.sliit.repository.BranchManagerRepository;
 import edu.sliit.repository.BranchRepository;
 import edu.sliit.service.BranchService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import edu.sliit.entity.PharmacyManagerEntity;
-import edu.sliit.repository.PharmacyManagerRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class BranchServiceImpl implements BranchService {
 
     final BranchRepository repository;
-    final PharmacyManagerRepository pharmacyManagerRepository;
+    final BranchManagerRepository branchManagerRepository;
     final ModelMapper mapper;
 
     @Override
@@ -33,7 +33,7 @@ public class BranchServiceImpl implements BranchService {
 
             if (branchEntity.getManager() != null) {
                 branch.setManagerId(
-                        branchEntity.getManager().getManagerId()
+                        branchEntity.getManager().getBranchManagerId()
                 );
             }
 
@@ -49,11 +49,11 @@ public class BranchServiceImpl implements BranchService {
         BranchEntity entity =
                 mapper.map(branch, BranchEntity.class);
 
-        PharmacyManagerEntity manager =
-                pharmacyManagerRepository
+        BranchManagerEntity manager =
+                branchManagerRepository
                         .findById(branch.getManagerId())
                         .orElseThrow(() ->
-                                new RuntimeException("Pharmacy Manager not found"));
+                                new RuntimeException("Branch Manager not found"));
 
         entity.setManager(manager);
 
@@ -73,7 +73,7 @@ public class BranchServiceImpl implements BranchService {
 
         if (entity.getManager() != null) {
             branch.setManagerId(
-                    entity.getManager().getManagerId()
+                    entity.getManager().getBranchManagerId()
             );
         }
 
@@ -82,6 +82,7 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public List<Branch> searchByBranchName(String branchName) {
+
         List<Branch> branches = new ArrayList<>();
 
         repository.findByBranchNameContainingIgnoreCase(branchName)
@@ -98,6 +99,7 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public void deleteByBranchId(Integer branchId) {
+
         if (!repository.existsById(branchId)) {
             throw new RuntimeException("Branch not found");
         }
@@ -111,11 +113,11 @@ public class BranchServiceImpl implements BranchService {
         BranchEntity entity =
                 mapper.map(branch, BranchEntity.class);
 
-        PharmacyManagerEntity manager =
-                pharmacyManagerRepository
+        BranchManagerEntity manager =
+                branchManagerRepository
                         .findById(branch.getManagerId())
                         .orElseThrow(() ->
-                                new RuntimeException("Pharmacy Manager not found"));
+                                new RuntimeException("Branch Manager not found"));
 
         entity.setManager(manager);
 
