@@ -7,6 +7,7 @@ import edu.sliit.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import edu.sliit.exception.DuplicateResourceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,32 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void addCustomer(Customer customer) {
+        //User Name Validation
+        if (customer.getUsername() == null ||
+                customer.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Username is required");
+        }
+
+        if (repository.existsByUsername(customer.getUsername())) {
+            throw new DuplicateResourceException("Username already exists");
+        }
+
+        //Email Valadation
+        if (customer.getEmail() == null ||
+                customer.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
+
+        if (!customer.getEmail().matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new RuntimeException("Invalid email format");
+        }
+
+        if (repository.existsByEmail(customer.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        //Default set Active Status
         if (customer.getStatus() == null) {
             customer.setStatus("ACTIVE");
         }

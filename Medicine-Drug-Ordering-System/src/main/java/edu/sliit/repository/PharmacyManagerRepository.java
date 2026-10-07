@@ -18,4 +18,8 @@ public interface PharmacyManagerRepository
     findByStatusIgnoreCase(String status);
 
     Optional<PharmacyManagerEntity> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

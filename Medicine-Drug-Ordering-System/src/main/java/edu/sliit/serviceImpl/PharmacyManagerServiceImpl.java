@@ -2,6 +2,8 @@ package edu.sliit.serviceImpl;
 
 import edu.sliit.dto.PharmacyManager;
 import edu.sliit.entity.PharmacyManagerEntity;
+import edu.sliit.exception.BadRequestException;
+import edu.sliit.exception.DuplicateResourceException;
 import edu.sliit.repository.PharmacyManagerRepository;
 import edu.sliit.service.PharmacyManagerService;
 import lombok.RequiredArgsConstructor;
@@ -96,8 +98,67 @@ public class PharmacyManagerServiceImpl implements PharmacyManagerService {
     @Override
     public void addPharmacyManager(PharmacyManager manager) {
 
-        if (manager.getStatus() == null) {
+        // Username validation
+        if (manager.getUsername() == null ||
+                manager.getUsername().trim().isEmpty()) {
+
+            throw new BadRequestException("Username is required");
+        }
+
+        // Duplicate username validation
+        if (repository.existsByUsername(manager.getUsername())) {
+
+            throw new DuplicateResourceException(
+                    "Username already exists"
+            );
+        }
+
+        // Email validation
+        if (manager.getEmail() == null ||
+                manager.getEmail().trim().isEmpty()) {
+
+            throw new BadRequestException("Email is required");
+        }
+
+        if (!manager.getEmail().matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            throw new BadRequestException("Invalid email format");
+        }
+
+        // Duplicate email validation
+        if (repository.existsByEmail(manager.getEmail())) {
+
+            throw new DuplicateResourceException(
+                    "Email already exists"
+            );
+        }
+
+        // Phone validation
+        if (manager.getPhoneNo() == null ||
+                manager.getPhoneNo().trim().isEmpty()) {
+
+            throw new BadRequestException("Phone number is required");
+        }
+
+        if (!manager.getPhoneNo().matches("^0\\d{9}$")) {
+
+            throw new BadRequestException(
+                    "Invalid Sri Lankan phone number"
+            );
+        }
+
+        // Status validation
+        if (manager.getStatus() == null ||
+                manager.getStatus().trim().isEmpty()) {
+
             manager.setStatus("ACTIVE");
+        }
+
+        if (!manager.getStatus().equalsIgnoreCase("ACTIVE") &&
+                !manager.getStatus().equalsIgnoreCase("INACTIVE")) {
+
+            throw new BadRequestException("Invalid status");
         }
 
         PharmacyManagerEntity entity =
@@ -109,6 +170,89 @@ public class PharmacyManagerServiceImpl implements PharmacyManagerService {
     @Override
     public void updatePharmacyManager(PharmacyManager manager) {
 
+        if (manager.getManagerId() == null) {
+
+            throw new BadRequestException(
+                    "Pharmacy Manager ID is required"
+            );
+        }
+
+        PharmacyManagerEntity existing =
+                repository.findById(manager.getManagerId())
+                        .orElseThrow(() ->
+                                new BadRequestException(
+                                        "Pharmacy Manager not found"
+                                ));
+
+        // Username validation
+        if (manager.getUsername() == null ||
+                manager.getUsername().trim().isEmpty()) {
+
+            throw new BadRequestException("Username is required");
+        }
+
+        if (!manager.getUsername()
+                .equalsIgnoreCase(existing.getUsername())) {
+
+            if (repository.existsByUsername(manager.getUsername())) {
+
+                throw new DuplicateResourceException(
+                        "Username already exists"
+                );
+            }
+        }
+
+        // Email validation
+        if (manager.getEmail() == null ||
+                manager.getEmail().trim().isEmpty()) {
+
+            throw new BadRequestException("Email is required");
+        }
+
+        if (!manager.getEmail().matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            throw new BadRequestException("Invalid email format");
+        }
+
+        if (!manager.getEmail()
+                .equalsIgnoreCase(existing.getEmail())) {
+
+            if (repository.existsByEmail(manager.getEmail())) {
+
+                throw new DuplicateResourceException(
+                        "Email already exists"
+                );
+            }
+        }
+
+        // Phone validation
+        if (manager.getPhoneNo() == null ||
+                manager.getPhoneNo().trim().isEmpty()) {
+
+            throw new BadRequestException("Phone number is required");
+        }
+
+        if (!manager.getPhoneNo().matches("^0\\d{9}$")) {
+
+            throw new BadRequestException(
+                    "Invalid Sri Lankan phone number"
+            );
+        }
+
+        // Status validation
+        if (manager.getStatus() == null ||
+                manager.getStatus().trim().isEmpty()) {
+
+            manager.setStatus("ACTIVE");
+        }
+
+        if (!manager.getStatus().equalsIgnoreCase("ACTIVE") &&
+                !manager.getStatus().equalsIgnoreCase("INACTIVE")) {
+
+            throw new BadRequestException("Invalid status");
+        }
+
         PharmacyManagerEntity entity =
                 mapper.map(manager, PharmacyManagerEntity.class);
 
@@ -119,7 +263,10 @@ public class PharmacyManagerServiceImpl implements PharmacyManagerService {
     public void deleteByManagerId(Integer managerId) {
 
         if (!repository.existsById(managerId)) {
-            throw new RuntimeException("Pharmacy Manager not found");
+
+            throw new RuntimeException(
+                    "Pharmacy Manager not found"
+            );
         }
 
         repository.deleteById(managerId);

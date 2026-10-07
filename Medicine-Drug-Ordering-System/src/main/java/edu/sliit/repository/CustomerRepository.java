@@ -14,4 +14,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Intege
 
     Optional<CustomerEntity> findByUsername(String username);
     boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+
 }
